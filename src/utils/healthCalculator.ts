@@ -1,0 +1,5 @@
+import { ActivityLevel, Profile } from '../types';
+export type Metrics = { bmi: number; bmr: number; tdee: number; calories: number; protein: number; activityLabel: string };
+const activityFactors: Record<ActivityLevel, number> = { 久坐: 1.2, '轻度活动': 1.375, '中度活动': 1.55, '高强度活动': 1.725 };
+export function calculateMetrics(profile: Profile): Metrics { const heightM = Math.max(profile.height, 1) / 100; const bmi = profile.weight / (heightM * heightM); const bmr = profile.gender === '男' ? 10 * profile.weight + 6.25 * profile.height - 5 * profile.age + 5 : 10 * profile.weight + 6.25 * profile.height - 5 * profile.age - 161; const tdee = bmr * activityFactors[profile.activity]; const goalAdjustment = profile.goal === '增肌' ? 250 : ['降低体脂', '精瘦', '腹肌明显'].includes(profile.goal) ? -350 : 0; const calories = Math.round(Math.max(bmr * 1.1, tdee + goalAdjustment)); const protein = Math.round(profile.weight * (profile.goal === '增肌' ? 1.8 : 1.6)); return { bmi, bmr, tdee, calories, protein, activityLabel: profile.activity }; }
+export function bmiLabel(bmi: number) { if (bmi < 18.5) return '偏低'; if (bmi < 24) return '健康'; if (bmi < 28) return '偏高'; return '较高'; }
